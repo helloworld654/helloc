@@ -224,7 +224,8 @@ static void vTaskStart(void *pvParameters)
     {
 		/* °´¼üÉ¨Ãè */
 		bsp_KeyScan();
-        vTaskDelay(10);
+        vTaskDelay(1000);
+		printf("print test success\r\n");
     }
 }
 
