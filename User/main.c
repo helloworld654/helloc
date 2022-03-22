@@ -219,7 +219,6 @@ static void vTaskMsgPro(void *pvParameters)
 *   ”≈ œ» º∂: 4  
 *********************************************************************************************************
 */
-// // #include "camera.h"
 // static void vTaskStart(void *pvParameters)
 // {
 // 	printf("enter task\r\n");

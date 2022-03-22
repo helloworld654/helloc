@@ -40,9 +40,7 @@ void start(void)
 	  LCD_Fill(30,130,239,170,WHITE);
 		delay_ms(200);
 	}
-	printf("[%s] a\r\n",__func__);
 	LCD_ShowString(30,130,200,16,16,"OV2640 OK");
-	printf("[%s] end\r\n",__func__);
 	delay_ms(100);
 }
 
@@ -53,7 +51,6 @@ uint8_t OV2640_Init(void)
 	uint16_t reg;
 	//设置IO     	 
   GPIO_InitTypeDef  GPIO_InitStructure;
-	printf("[%s] a\r\n",__func__)  ;
 
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
   //GPIOG9,15初始化设置
@@ -65,9 +62,7 @@ uint8_t OV2640_Init(void)
   GPIO_Init(GPIOG, &GPIO_InitStructure);//初始化
  
  	OV2640_PWDN=0;	//POWER ON
-	printf("[%s] b\r\n",__func__)  ;
 	delay_ms(10);
-	printf("[%s] c\r\n",__func__)  ;
 	OV2640_RST=0;	//复位OV2640
 	delay_ms(10);
 	OV2640_RST=1;	//结束复位 
@@ -96,7 +91,6 @@ uint8_t OV2640_Init(void)
 	{
 	   	SCCB_WR_Reg(ov2640_svga_init_reg_tbl[i][0],ov2640_svga_init_reg_tbl[i][1]);
  	} 
-	printf("[%s] end\r\n",__func__)  ;
   	return 0x00; 	//ok
 } 
 //OV2640切换为JPEG模式
