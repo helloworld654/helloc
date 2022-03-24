@@ -63,10 +63,10 @@
 	#define GPIO_PIN_LED1	GPIO_Pin_10
 
 	#define GPIO_PORT_LED2  GPIOF
-	#define GPIO_PIN_LED2	GPIO_Pin_7
+	#define GPIO_PIN_LED2	GPIO_Pin_9
 
 	#define GPIO_PORT_LED3  GPIOF
-	#define GPIO_PIN_LED3	GPIO_Pin_8
+	#define GPIO_PIN_LED3	GPIO_Pin_10
 
 	#define GPIO_PORT_LED4  GPIOC
 	#define GPIO_PIN_LED4	GPIO_Pin_2

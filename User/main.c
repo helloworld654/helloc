@@ -59,9 +59,7 @@
 *********************************************************************************************************
 */
 #include "includes.h"
-
-
-
+#include "camera.h"
 /*
 **********************************************************************************************************
 											函数声明
@@ -70,8 +68,7 @@
 static void vTaskTaskUserIF(void *pvParameters);
 static void vTaskLED(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
-// static void vTaskStart(void *pvParameters);
-// static void AppTaskCreate (void);
+static void AppTaskCreate (void);
 
 
 /*
@@ -93,7 +90,6 @@ static TaskHandle_t xHandleTaskStart = NULL;
 *	返 回 值: 无
 *********************************************************************************************************
 */
-extern void AppTaskCreate (void);
 int main(void)
 {
 	/* 
@@ -185,10 +181,13 @@ static void vTaskTaskUserIF(void *pvParameters)
 */
 static void vTaskLED(void *pvParameters)
 {
+	bsp_LedOn(2);
+	bsp_LedOff(3);
     while(1)
     {
 		bsp_LedToggle(2);
-        vTaskDelay(200);
+		bsp_LedToggle(3);
+        vTaskDelay(1000);
     }
 }
 
@@ -203,32 +202,14 @@ static void vTaskLED(void *pvParameters)
 */
 static void vTaskMsgPro(void *pvParameters)
 {
+	KEY_Init();
     while(1)
     {
-		bsp_LedToggle(3);
-        vTaskDelay(300);
+		update_threshold_through_key();
+        vTaskDelay(10);
     }
 }
 
-/*
-*********************************************************************************************************
-*	函 数 名: vTaskStart
-*	功能说明: 启动任务，也就是最高优先级任务，这里用作按键扫描。
-*	形    参: pvParameters 是在创建该任务时传递的形参
-*	返 回 值: 无
-*   优 先 级: 4  
-*********************************************************************************************************
-*/
-// static void vTaskStart(void *pvParameters)
-// {
-// 	printf("enter task\r\n");
-//     while(1)
-//     {
-// 		vTaskDelay(1000);
-//     }
-// }
-
-extern void vTaskStart(void *pvParameters);
 /*
 *********************************************************************************************************
 *	函 数 名: AppTaskCreate
@@ -247,26 +228,26 @@ static void AppTaskCreate (void)
     //              &xHandleTaskUserIF );  /* 任务句柄  */
 	
 	
-	// xTaskCreate( vTaskLED,    		/* 任务函数  */
-    //              "vTaskLED",  		/* 任务名    */
-    //              512,         		/* 任务栈大小，单位word，也就是4字节 */
-    //              NULL,        		/* 任务参数  */
-    //              2,           		/* 任务优先级*/
-    //              &xHandleTaskLED ); /* 任务句柄  */
+	xTaskCreate( vTaskLED,    		/* 任务函数  */
+                 "vTaskLED",  		/* 任务名    */
+                 512,         		/* 任务栈大小，单位word，也就是4字节 */
+                 NULL,        		/* 任务参数  */
+                 2,           		/* 任务优先级*/
+                 &xHandleTaskLED ); /* 任务句柄  */
 	
-	// xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
-    //              "vTaskMsgPro",   		/* 任务名    */
-    //              512,             		/* 任务栈大小，单位word，也就是4字节 */
-    //              NULL,           		/* 任务参数  */
-    //              3,               		/* 任务优先级*/
-    //              &xHandleTaskMsgPro );  /* 任务句柄  */
+	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
+                 "vTaskMsgPro",   		/* 任务名    */
+                 512,             		/* 任务栈大小，单位word，也就是4字节 */
+                 NULL,           		/* 任务参数  */
+                 4,               		/* 任务优先级*/
+                 &xHandleTaskMsgPro );  /* 任务句柄  */
 	
 	
 	xTaskCreate( vTaskStart,     		/* 任务函数  */
                  "vTaskStart",   		/* 任务名    */
                  1024,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
-                 4,              		/* 任务优先级*/
+                 3,              		/* 任务优先级*/
                  &xHandleTaskStart );   /* 任务句柄  */
 }
 

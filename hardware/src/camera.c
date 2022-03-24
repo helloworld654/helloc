@@ -22,7 +22,6 @@ void camera_init(void)
 	bsp_InitDWT();
 	LCD_Init();
 	start();
-	KEY_Init();
     OV2640_OutSize_Set(ROW_A,LINE_B);
     OV2640_RGB565_Mode();	//RGB565模式
     My_DCMI_Init();			//DCMI配置
@@ -31,7 +30,7 @@ void camera_init(void)
 	OV2640_Special_Effects(2);
 }
 
-void key()
+void update_threshold_through_key(void)
 { 	
 	uint8_t key;
 	key=KEY_Scan(0);
@@ -65,7 +64,6 @@ void vTaskStart(void *pvParameters)
 		LCD_WriteRAM_Prepare();
 		hang=0;
 		POINT_COLOR=RED;
-		key();
 		for(i=0;i<LINE_B;i++)
 		{
 			for(j=0;j<ROW_A;j++)
