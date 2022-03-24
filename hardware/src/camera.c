@@ -3,10 +3,12 @@
 #include "lcd.h"
 #include "key.h"
 
-// int A=240,B=240;
-// static uint16_t rgb_buf[240][240] = {0};
-int A=200,B=200;
-uint16_t rgb_buf[200][200] = {0};
+// #define ROW_A    240
+// #define LINE_B    240
+#define ROW_A    200
+#define LINE_B    200
+
+uint16_t rgb_buf[LINE_B][ROW_A] = {0};
 uint16_t gray,num;
 uint16_t hang=0;
 uint8_t X_MIN,Y_MIN=240;
@@ -21,7 +23,7 @@ void camera_init(void)
 	LCD_Init();
 	start();
 	KEY_Init();
-    OV2640_OutSize_Set(A,B);
+    OV2640_OutSize_Set(ROW_A,LINE_B);
     OV2640_RGB565_Mode();	//RGB565模式
     My_DCMI_Init();			//DCMI配置
     DCMI_DMA_Init(rgb_buf,sizeof(rgb_buf)/4,DMA_MemoryDataSize_HalfWord,DMA_MemoryInc_Enable);//DCMI DMA配置
@@ -62,11 +64,11 @@ void vTaskStart(void *pvParameters)
 		POINT_COLOR=RED;
 		key();
 		
-				for(i=0;i<B;i++)
+				for(i=0;i<LINE_B;i++)
             {
-                for(j=0;j<A;j++)
+                for(j=0;j<ROW_A;j++)
                 {
-                    if(j==(A-1))
+                    if(j==(ROW_A-1))
                     {
                         hang++;
                         LCD_SetCursor(0,i+1);  
