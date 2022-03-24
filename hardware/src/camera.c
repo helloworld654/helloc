@@ -32,24 +32,26 @@ void camera_init(void)
 }
 
 void key()
-{ uint8_t key;
+{ 	
+	uint8_t key;
 	key=KEY_Scan(0);
 	if(key)
 	{
 		switch(key){
-		  case KEY0_PRES :MIN_threshold++;break;
-			case KEY1_PRES :MIN_threshold--;break;
-			case KEY2_PRES :MAX_threshold++;break;
-			case WKUP_PRES :MAX_threshold--;break;
-		
+		  	case KEY0_PRES :MIN_threshold++;
+				break;
+			case KEY1_PRES :MIN_threshold--;
+				break;
+			case KEY2_PRES :MAX_threshold++;
+				break;
+			case WKUP_PRES :MAX_threshold--;
+				break;
+			default:
+				break;
+		}
 	}
-	
-}
 }
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include "includes.h"
 void vTaskStart(void *pvParameters)
 {
 	printf("enter camera task\r\n");
@@ -63,36 +65,32 @@ void vTaskStart(void *pvParameters)
 		hang=0;
 		POINT_COLOR=RED;
 		key();
-		
-				for(i=0;i<LINE_B;i++)
-            {
-                for(j=0;j<ROW_A;j++)
-                {
-                    if(j==(ROW_A-1))
-                    {
-                        hang++;
-                        LCD_SetCursor(0,i+1);  
-                        LCD_WriteRAM_Prepare();		//开始写入GRAM
-                    }
-									//	LCD->LCD_RAM=rgb_buf[i][j];
-										gray=((rgb_buf[i][j]>>11)*19595+((rgb_buf[i][j]>>5)&0x3f)*38469 +(rgb_buf[i][j]&0x1f)*7472)>>16;
-                    if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
-                    {
-											num++;
-											Y_SUM+=i;
-											X_SUM+=j;
-											LCD->LCD_RAM=WHITE;
-                    }
-                    else
-                    {
-											LCD->LCD_RAM=BLACK;
-                    }
+		for(i=0;i<LINE_B;i++)
+		{
+			for(j=0;j<ROW_A;j++)
+			{
+				if(j==(ROW_A-1))
+				{
+					hang++;
+					LCD_SetCursor(0,i+1);  
+					LCD_WriteRAM_Prepare();		//开始写入GRAM
+				}
+				//	LCD->LCD_RAM=rgb_buf[i][j];
+				gray=((rgb_buf[i][j]>>11)*19595+((rgb_buf[i][j]>>5)&0x3f)*38469 +(rgb_buf[i][j]&0x1f)*7472)>>16;
+				if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
+				{
+					num++;
+					Y_SUM+=i;
+					X_SUM+=j;
+					LCD->LCD_RAM=WHITE;
+				}
+				else
+				{
+					LCD->LCD_RAM=BLACK;
+				}
 
-                }
-            }
-						
-						
-						
+			}
+		}		
 		X=(X_SUM)/num;Y=(Y_SUM)/num;	
 		LCD_Draw_Circle(X,Y,10);
 		LCD_DrawLine(X,Y-10,X,Y+10);
