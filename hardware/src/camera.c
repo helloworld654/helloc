@@ -16,10 +16,12 @@ uint8_t X_MAX,Y_MAX=0;
 uint32_t X_SUM,Y_SUM=0;
 uint8_t X,Y;
 uint8_t MAX_threshold=47,MIN_threshold=29 ;
+uint16_t fps_recording = 0;
 
 void camera_init(void)
 {
-	bsp_InitDWT();
+	fps_recording = 0;
+	bsp_InitDWT();   //init for us timer
 	LCD_Init();
 	start();
     OV2640_OutSize_Set(ROW_A,LINE_B);
@@ -89,7 +91,8 @@ void vTaskStart(void *pvParameters)
 				}
 
 			}
-		}		
+		}
+		fps_recording++;
 		X=(X_SUM)/num;Y=(Y_SUM)/num;	
 		LCD_Draw_Circle(X,Y,10);
 		LCD_DrawLine(X,Y-10,X,Y+10);

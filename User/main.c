@@ -179,6 +179,7 @@ static void vTaskTaskUserIF(void *pvParameters)
 *   ”≈ œ» º∂: 2  
 *********************************************************************************************************
 */
+extern uint16_t fps_recording;
 static void vTaskLED(void *pvParameters)
 {
 	bsp_LedOn(2);
@@ -188,6 +189,8 @@ static void vTaskLED(void *pvParameters)
 		bsp_LedToggle(2);
 		bsp_LedToggle(3);
         vTaskDelay(1000);
+		printf("fps:%d\r\n",fps_recording);
+		fps_recording = 0;
     }
 }
 
