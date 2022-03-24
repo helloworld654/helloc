@@ -60,6 +60,7 @@
 */
 #include "includes.h"
 #include "camera.h"
+#include "following.h"
 /*
 **********************************************************************************************************
 											函数声明
@@ -69,7 +70,7 @@ static void vTaskTaskUserIF(void *pvParameters);
 static void vTaskLED(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
 static void AppTaskCreate (void);
-
+static void AppObjCreate (void);
 
 /*
 **********************************************************************************************************
@@ -80,7 +81,10 @@ static TaskHandle_t xHandleTaskUserIF = NULL;
 static TaskHandle_t xHandleTaskLED = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
 static TaskHandle_t xHandleTaskStart = NULL;
+static TaskHandle_t xHandleTaskFollowing = NULL;
 
+QueueHandle_t xQueueLineProcess = NULL;
+QueueHandle_t xQueueCameraReady = NULL;
 
 /*
 *********************************************************************************************************
@@ -114,6 +118,8 @@ int main(void)
 	
 	/* 创建任务 */
 	AppTaskCreate();
+
+	AppObjCreate();
 	
     /* 启动调度，开始执行任务 */
     vTaskStartScheduler();
@@ -182,6 +188,7 @@ static void vTaskTaskUserIF(void *pvParameters)
 extern uint16_t fps_recording;
 static void vTaskLED(void *pvParameters)
 {
+	uint8_t num = 0;
 	bsp_LedOn(2);
 	bsp_LedOff(3);
     while(1)
@@ -191,6 +198,8 @@ static void vTaskLED(void *pvParameters)
         vTaskDelay(1000);
 		printf("fps:%d\r\n",fps_recording);
 		fps_recording = 0;
+		xQueueSend(xQueueLineProcess,&num,1000);
+		num++;
     }
 }
 
@@ -252,6 +261,32 @@ static void AppTaskCreate (void)
                  NULL,           		/* 任务参数  */
                  3,              		/* 任务优先级*/
                  &xHandleTaskStart );   /* 任务句柄  */
+
+	xTaskCreate( vTaskFollowing,     		/* 任务函数  */
+                 "vTaskFollowing",   		/* 任务名    */
+                 512,            		/* 任务栈大小，单位word，也就是4字节 */
+                 NULL,           		/* 任务参数  */
+                 3,              		/* 任务优先级*/
+                 &xHandleTaskFollowing );   /* 任务句柄  */
+}
+
+static void AppObjCreate (void)
+{
+	/* 创建10个uint8_t型消息队列 */
+	xQueueLineProcess = xQueueCreate(5, sizeof(uint8_t));
+    if( xQueueLineProcess == 0 )
+    {
+		printf("[%s] create queu fail\r\n",__func__);
+        /* 没有创建成功，用户可以在这里加入创建失败的处理机制 */
+    }
+	
+	/* 创建10个存储指针变量的消息队列，由于CM3/CM4内核是32位机，一个指针变量占用4个字节 */
+	xQueueCameraReady = xQueueCreate(5, sizeof(uint8_t));
+    if( xQueueCameraReady == 0 )
+    {
+		printf("[%s] create queu fail\r\n",__func__);
+        /* 没有创建成功，用户可以在这里加入创建失败的处理机制 */
+    }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/
