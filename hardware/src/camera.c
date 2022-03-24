@@ -39,12 +39,13 @@ void key()
 	{
 		switch(key){
 		  	case KEY0_PRES :MIN_threshold++;
+			  	printf("get the key0\r\n");
 				break;
 			case KEY1_PRES :MIN_threshold--;
-				break;
-			case KEY2_PRES :MAX_threshold++;
+			  	printf("get the key1\r\n");
 				break;
 			case WKUP_PRES :MAX_threshold--;
+			  	printf("get the wkup\r\n");
 				break;
 			default:
 				break;
