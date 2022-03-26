@@ -21,6 +21,7 @@ void start(void);
 #define OV2640_MID				0X7FA2
 #define OV2640_PID				0X2642
  
+#define OV2640_LED_light  	PFout(8)			//补光LED灯控制引脚
 
 //当选择DSP地址(0XFF=0X00)时,OV2640的DSP寄存器地址映射表
 #define OV2640_DSP_R_BYPASS     0x05

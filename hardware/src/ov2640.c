@@ -61,6 +61,19 @@ uint8_t OV2640_Init(void)
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
   GPIO_Init(GPIOG, &GPIO_InitStructure);//初始化
  
+	// for ov2640 camera light led
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;//PF8推挽输出
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; //推挽输出
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//100MHz
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
+	GPIO_Init(GPIOF, &GPIO_InitStructure);//初始化
+	
+	OV2640_LED_light=0;//关闭补光LED
+	OV2640_LED_light=1;//开启补光LED
+	OV2640_LED_light=0;//关闭补光LED
+	OV2640_LED_light=1;//开启补光LED
+
  	OV2640_PWDN=0;	//POWER ON
 	delay_ms(10);
 	OV2640_RST=0;	//复位OV2640
