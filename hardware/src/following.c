@@ -13,7 +13,6 @@ void vTaskFollowing(void *pvParameters)
 	xQueueSend(xQueueCameraReady,&ready,3000);
     while(1){
         if(xQueueReceive(xQueueLineProcess,&line_picN,0xffffffff)){
-            printf("picN:%d\r\n",line_picN);
 
 			xQueueSend(xQueueCameraReady,&ready,3000);
         }

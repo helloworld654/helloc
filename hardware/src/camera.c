@@ -4,13 +4,16 @@
 #include "lcd.h"
 #include "key.h"
 
+#define LCD_X_MOVE    25
+#define LCD_Y_MOVE    25
+
 uint16_t fps_recording = 0;
 extern uint8_t line_pic0[ROW_A/2][LINE_B/2];
 extern uint8_t line_pic1[ROW_A/2][LINE_B/2];
 extern QueueHandle_t xQueueLineProcess;
 extern QueueHandle_t xQueueCameraReady;
 
-uint16_t rgb_buf[LINE_B][ROW_A] = {0};
+uint16_t rgb_buf[ROW_A][LINE_B] = {0};
 uint16_t gray,num;
 uint16_t hang=0;
 uint8_t X_MIN,Y_MIN=240;
@@ -66,24 +69,23 @@ void vTaskStart(void *pvParameters)
     while(1)
     {
         if(xQueueReceive(xQueueCameraReady,&ready,0xffffffff)){
-			printf("AA\r\n");
 			line_pic_send = (++line_pic_num)%2;
 			LCD_SetCursor(0,0);  
 			LCD_WriteRAM_Prepare();
 			hang=0;
 			POINT_COLOR=RED;
-			for(i=0;i<LINE_B;i++)
+			for(i=0;i<ROW_A;i++)
 			{
-				for(j=0;j<ROW_A;j++)
+				for(j=0;j<LINE_B;j++)
 				{
-					if(j==(ROW_A-1))
+					if(j==(LINE_B-1))
 					{
 						hang++;
-						LCD_SetCursor(0,i+1);  
+						LCD_SetCursor(LCD_X_MOVE,i+1+LCD_Y_MOVE);  
 						LCD_WriteRAM_Prepare();		//开始写入GRAM
 					}
 					//	LCD->LCD_RAM=rgb_buf[i][j];
-					gray=((rgb_buf[i][j]>>11)*19595+((rgb_buf[i][j]>>5)&0x3f)*38469 +(rgb_buf[i][j]&0x1f)*7472)>>16;
+					gray=((rgb_buf[ROW_A-i][LINE_B-j]>>11)*19595+((rgb_buf[ROW_A-i][LINE_B-j]>>5)&0x3f)*38469 +(rgb_buf[ROW_A-i][LINE_B-j]&0x1f)*7472)>>16;
 					if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
 					{
 						num++;
