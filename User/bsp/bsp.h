@@ -77,6 +77,7 @@
 #include "bsp_dwt.h"
 
 #include "bsp_tim_pwm.h"
+#include "usart.h"
 
 //#include "bsp_cpu_flash.h"
 //#include "bsp_sdio_sd.h"

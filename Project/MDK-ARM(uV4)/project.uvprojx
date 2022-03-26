@@ -434,11 +434,6 @@
               <FilePath>..\..\User\bsp\stm32f4xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_uart_fifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\bsp\src\bsp_uart_fifo.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_tim_pwm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\bsp_tim_pwm.c</FilePath>
@@ -652,6 +647,16 @@
               <FileName>camera.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hardware\src\camera.c</FilePath>
+            </File>
+            <File>
+              <FileName>following.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\src\following.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hardware\src\usart.c</FilePath>
             </File>
           </Files>
         </Group>
