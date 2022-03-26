@@ -8,8 +8,8 @@
 #define LCD_Y_MOVE    25
 
 uint16_t fps_recording = 0;
-extern uint8_t line_pic0[ROW_A/2][LINE_B/2];
-extern uint8_t line_pic1[ROW_A/2][LINE_B/2];
+extern uint8_t line_pic0[ROW_A/SKIP_FOR_ROW][LINE_B/SKIP_FOR_LINE];
+extern uint8_t line_pic1[ROW_A/SKIP_FOR_ROW][LINE_B/SKIP_FOR_LINE];
 extern QueueHandle_t xQueueLineProcess;
 extern QueueHandle_t xQueueCameraReady;
 
@@ -81,21 +81,21 @@ void vTaskStart(void *pvParameters)
 					if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
 					{
 						LCD->LCD_RAM=WHITE;
-						if(i%2==0 && j%2==0){
+						if(i%SKIP_FOR_ROW==0 && j%SKIP_FOR_LINE==0){
 							if(line_pic_send)
-								line_pic1[i/2][j/2] = 0;
+								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_LINE] = 0;
 							else
-								line_pic0[i/2][j/2] = 0;
+								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_LINE] = 0;
 						}
 					}
 					else
 					{
 						LCD->LCD_RAM=BLACK;
-						if(i%2==0 && j%2==0){
+						if(i%SKIP_FOR_ROW==0 && j%SKIP_FOR_LINE==0){
 							if(line_pic_send)
-								line_pic1[i/2][j/2] = 1;
+								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_LINE] = 1;
 							else
-								line_pic0[i/2][j/2] = 1;
+								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_LINE] = 1;
 						}
 					}
 
