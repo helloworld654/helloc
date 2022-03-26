@@ -14,12 +14,6 @@ extern QueueHandle_t xQueueLineProcess;
 extern QueueHandle_t xQueueCameraReady;
 
 uint16_t rgb_buf[ROW_A][LINE_B] = {0};
-uint16_t gray,num;
-uint16_t hang=0;
-uint8_t X_MIN,Y_MIN=240;
-uint8_t X_MAX,Y_MAX=0; 
-uint32_t X_SUM,Y_SUM=0;
-uint8_t X,Y;
 uint8_t MAX_threshold=47,MIN_threshold=29 ;
 
 void camera_init(void)
@@ -61,6 +55,7 @@ void update_threshold_through_key(void)
 void vTaskStart(void *pvParameters)
 {
 	uint8_t i,j,line_pic_send,line_pic_num,ready;
+	uint16_t gray;
 	line_pic_num = line_pic_send =  0;
 	printf("enter camera task\r\n");
 	camera_init();
@@ -72,15 +67,12 @@ void vTaskStart(void *pvParameters)
 			line_pic_send = (++line_pic_num)%2;
 			LCD_SetCursor(0,0);  
 			LCD_WriteRAM_Prepare();
-			hang=0;
-			POINT_COLOR=RED;
 			for(i=0;i<ROW_A;i++)
 			{
 				for(j=0;j<LINE_B;j++)
 				{
 					if(j==(LINE_B-1))
 					{
-						hang++;
 						LCD_SetCursor(LCD_X_MOVE,i+1+LCD_Y_MOVE);  
 						LCD_WriteRAM_Prepare();		//开始写入GRAM
 					}
@@ -88,9 +80,6 @@ void vTaskStart(void *pvParameters)
 					gray=((rgb_buf[ROW_A-i][LINE_B-j]>>11)*19595+((rgb_buf[ROW_A-i][LINE_B-j]>>5)&0x3f)*38469 +(rgb_buf[ROW_A-i][LINE_B-j]&0x1f)*7472)>>16;
 					if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
 					{
-						num++;
-						Y_SUM+=i;
-						X_SUM+=j;
 						LCD->LCD_RAM=WHITE;
 						if(i%2==0 && j%2==0){
 							if(line_pic_send)
@@ -113,15 +102,8 @@ void vTaskStart(void *pvParameters)
 				}
 			}
 			fps_recording++;
-			X=(X_SUM)/num;Y=(Y_SUM)/num;	
-			LCD_Draw_Circle(X,Y,10);
-			LCD_DrawLine(X,Y-10,X,Y+10);
-			LCD_DrawLine(X-10,Y,X+10,Y);
-			LCD_ShowNum(0,240,X,8,16);
-			LCD_ShowNum(0,255,Y,8,16);
 			LCD_ShowNum(0,270,MIN_threshold,8,16);
 			LCD_ShowNum(0,285,MAX_threshold,8,16);		
-			X_SUM=0;Y_SUM=0;num=0;
 
 			xQueueSend(xQueueLineProcess,&line_pic_send,3000);
 		}
