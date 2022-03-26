@@ -196,9 +196,8 @@ static void vTaskLED(void *pvParameters)
 		bsp_LedToggle(2);
 		bsp_LedToggle(3);
         vTaskDelay(1000);
-		printf("fps:%d\r\n",fps_recording);
+		printf("------ fps:%d\r\n",fps_recording);
 		fps_recording = 0;
-		xQueueSend(xQueueLineProcess,&num,1000);
 		num++;
     }
 }
@@ -244,7 +243,7 @@ static void AppTaskCreate (void)
                  "vTaskLED",  		/* 任务名    */
                  512,         		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,        		/* 任务参数  */
-                 2,           		/* 任务优先级*/
+                 4,           		/* 任务优先级*/
                  &xHandleTaskLED ); /* 任务句柄  */
 	
 	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */

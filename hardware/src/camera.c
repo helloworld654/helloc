@@ -1,12 +1,14 @@
 #include "camera.h"
-#include "bsp.h"
+#include "includes.h"
+#include "following.h"
 #include "lcd.h"
 #include "key.h"
 
-// #define ROW_A    240
-// #define LINE_B    240
-#define ROW_A    200
-#define LINE_B    200
+uint16_t fps_recording = 0;
+extern uint8_t line_pic0[ROW_A/2][LINE_B/2];
+extern uint8_t line_pic1[ROW_A/2][LINE_B/2];
+extern QueueHandle_t xQueueLineProcess;
+extern QueueHandle_t xQueueCameraReady;
 
 uint16_t rgb_buf[LINE_B][ROW_A] = {0};
 uint16_t gray,num;
@@ -16,7 +18,6 @@ uint8_t X_MAX,Y_MAX=0;
 uint32_t X_SUM,Y_SUM=0;
 uint8_t X,Y;
 uint8_t MAX_threshold=47,MIN_threshold=29 ;
-uint16_t fps_recording = 0;
 
 void camera_init(void)
 {
@@ -56,52 +57,71 @@ void update_threshold_through_key(void)
 
 void vTaskStart(void *pvParameters)
 {
+	uint8_t i,j,line_pic_send,line_pic_num,ready;
+	line_pic_num = line_pic_send =  0;
 	printf("enter camera task\r\n");
 	camera_init();
 	printf("camera init success\r\n");
+	xQueueSend(xQueueLineProcess,&line_pic_send,1000);
     while(1)
     {
-    	uint16_t i,j;
-		LCD_SetCursor(0,0);  
-		LCD_WriteRAM_Prepare();
-		hang=0;
-		POINT_COLOR=RED;
-		for(i=0;i<LINE_B;i++)
-		{
-			for(j=0;j<ROW_A;j++)
+        if(xQueueReceive(xQueueCameraReady,&ready,0xffffffff)){
+			printf("AA\r\n");
+			line_pic_send = (++line_pic_num)%2;
+			LCD_SetCursor(0,0);  
+			LCD_WriteRAM_Prepare();
+			hang=0;
+			POINT_COLOR=RED;
+			for(i=0;i<LINE_B;i++)
 			{
-				if(j==(ROW_A-1))
+				for(j=0;j<ROW_A;j++)
 				{
-					hang++;
-					LCD_SetCursor(0,i+1);  
-					LCD_WriteRAM_Prepare();		//开始写入GRAM
-				}
-				//	LCD->LCD_RAM=rgb_buf[i][j];
-				gray=((rgb_buf[i][j]>>11)*19595+((rgb_buf[i][j]>>5)&0x3f)*38469 +(rgb_buf[i][j]&0x1f)*7472)>>16;
-				if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
-				{
-					num++;
-					Y_SUM+=i;
-					X_SUM+=j;
-					LCD->LCD_RAM=WHITE;
-				}
-				else
-				{
-					LCD->LCD_RAM=BLACK;
-				}
+					if(j==(ROW_A-1))
+					{
+						hang++;
+						LCD_SetCursor(0,i+1);  
+						LCD_WriteRAM_Prepare();		//开始写入GRAM
+					}
+					//	LCD->LCD_RAM=rgb_buf[i][j];
+					gray=((rgb_buf[i][j]>>11)*19595+((rgb_buf[i][j]>>5)&0x3f)*38469 +(rgb_buf[i][j]&0x1f)*7472)>>16;
+					if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
+					{
+						num++;
+						Y_SUM+=i;
+						X_SUM+=j;
+						LCD->LCD_RAM=WHITE;
+						if(i%2==0 && j%2==0){
+							if(line_pic_send)
+								line_pic1[i/2][j/2] = 0;
+							else
+								line_pic0[i/2][j/2] = 0;
+						}
+					}
+					else
+					{
+						LCD->LCD_RAM=BLACK;
+						if(i%2==0 && j%2==0){
+							if(line_pic_send)
+								line_pic1[i/2][j/2] = 1;
+							else
+								line_pic0[i/2][j/2] = 1;
+						}
+					}
 
+				}
 			}
+			fps_recording++;
+			X=(X_SUM)/num;Y=(Y_SUM)/num;	
+			LCD_Draw_Circle(X,Y,10);
+			LCD_DrawLine(X,Y-10,X,Y+10);
+			LCD_DrawLine(X-10,Y,X+10,Y);
+			LCD_ShowNum(0,240,X,8,16);
+			LCD_ShowNum(0,255,Y,8,16);
+			LCD_ShowNum(0,270,MIN_threshold,8,16);
+			LCD_ShowNum(0,285,MAX_threshold,8,16);		
+			X_SUM=0;Y_SUM=0;num=0;
+
+			xQueueSend(xQueueLineProcess,&line_pic_send,3000);
 		}
-		fps_recording++;
-		X=(X_SUM)/num;Y=(Y_SUM)/num;	
-		LCD_Draw_Circle(X,Y,10);
-		LCD_DrawLine(X,Y-10,X,Y+10);
-		LCD_DrawLine(X-10,Y,X+10,Y);
-		LCD_ShowNum(0,240,X,8,16);
-		LCD_ShowNum(0,255,Y,8,16);
-		LCD_ShowNum(0,270,MIN_threshold,8,16);
-		LCD_ShowNum(0,285,MAX_threshold,8,16);		
-		X_SUM=0;Y_SUM=0;num=0;
-		vTaskDelay(5);
     }
 }
