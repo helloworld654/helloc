@@ -83,9 +83,9 @@ void vTaskStart(void *pvParameters)
 						LCD->LCD_RAM=WHITE;
 						if(i%SKIP_FOR_ROW==0 && j%SKIP_FOR_COL==0){
 							if(line_pic_send)
-								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 0;
+								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 1;
 							else
-								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 0;
+								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 1;
 						}
 					}
 					else
@@ -93,9 +93,9 @@ void vTaskStart(void *pvParameters)
 						LCD->LCD_RAM=BLACK;
 						if(i%SKIP_FOR_ROW==0 && j%SKIP_FOR_COL==0){
 							if(line_pic_send)
-								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 1;
+								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 0;
 							else
-								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 1;
+								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 0;
 						}
 					}
 

@@ -196,7 +196,7 @@ static void vTaskLED(void *pvParameters)
 		bsp_LedToggle(2);
 		bsp_LedToggle(3);
         vTaskDelay(1000);
-		printf("------ fps:%d\r\n",fps_recording);
+		printf("------------------------------- fps:%d\r\n",fps_recording);
 		fps_recording = 0;
 		num++;
     }
