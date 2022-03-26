@@ -2,8 +2,8 @@
 #include "includes.h"
 #include "camera.h"
 
-uint8_t line_pic0[ROW_A/SKIP_FOR_ROW][LINE_B/SKIP_FOR_LINE] = {0};
-uint8_t line_pic1[ROW_A/SKIP_FOR_ROW][LINE_B/SKIP_FOR_LINE] = {0};
+uint8_t line_pic0[ROW_A/SKIP_FOR_ROW][COL_B/SKIP_FOR_COL] = {0};
+uint8_t line_pic1[ROW_A/SKIP_FOR_ROW][COL_B/SKIP_FOR_COL] = {0};
 extern QueueHandle_t xQueueLineProcess;
 extern QueueHandle_t xQueueCameraReady;
 

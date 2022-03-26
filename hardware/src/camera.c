@@ -8,12 +8,12 @@
 #define LCD_Y_MOVE    25
 
 uint16_t fps_recording = 0;
-extern uint8_t line_pic0[ROW_A/SKIP_FOR_ROW][LINE_B/SKIP_FOR_LINE];
-extern uint8_t line_pic1[ROW_A/SKIP_FOR_ROW][LINE_B/SKIP_FOR_LINE];
+extern uint8_t line_pic0[ROW_A/SKIP_FOR_ROW][COL_B/SKIP_FOR_COL];
+extern uint8_t line_pic1[ROW_A/SKIP_FOR_ROW][COL_B/SKIP_FOR_COL];
 extern QueueHandle_t xQueueLineProcess;
 extern QueueHandle_t xQueueCameraReady;
 
-uint16_t rgb_buf[ROW_A][LINE_B] = {0};
+uint16_t rgb_buf[ROW_A][COL_B] = {0};
 uint8_t MAX_threshold=47,MIN_threshold=29 ;
 
 void camera_init(void)
@@ -22,7 +22,7 @@ void camera_init(void)
 	bsp_InitDWT();   //init for us timer
 	LCD_Init();
 	start();
-    OV2640_OutSize_Set(ROW_A,LINE_B);
+    OV2640_OutSize_Set(ROW_A,COL_B);
     OV2640_RGB565_Mode();	//RGB565模式
     My_DCMI_Init();			//DCMI配置
     DCMI_DMA_Init(rgb_buf,sizeof(rgb_buf)/4,DMA_MemoryDataSize_HalfWord,DMA_MemoryInc_Enable);//DCMI DMA配置
@@ -69,33 +69,33 @@ void vTaskStart(void *pvParameters)
 			LCD_WriteRAM_Prepare();
 			for(i=0;i<ROW_A;i++)
 			{
-				for(j=0;j<LINE_B;j++)
+				for(j=0;j<COL_B;j++)
 				{
-					if(j==(LINE_B-1))
+					if(j==(COL_B-1))
 					{
 						LCD_SetCursor(LCD_X_MOVE,i+1+LCD_Y_MOVE);  
 						LCD_WriteRAM_Prepare();		//开始写入GRAM
 					}
 					//	LCD->LCD_RAM=rgb_buf[i][j];
-					gray=((rgb_buf[ROW_A-i][LINE_B-j]>>11)*19595+((rgb_buf[ROW_A-i][LINE_B-j]>>5)&0x3f)*38469 +(rgb_buf[ROW_A-i][LINE_B-j]&0x1f)*7472)>>16;
+					gray=((rgb_buf[ROW_A-i][COL_B-j]>>11)*19595+((rgb_buf[ROW_A-i][COL_B-j]>>5)&0x3f)*38469 +(rgb_buf[ROW_A-i][COL_B-j]&0x1f)*7472)>>16;
 					if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
 					{
 						LCD->LCD_RAM=WHITE;
-						if(i%SKIP_FOR_ROW==0 && j%SKIP_FOR_LINE==0){
+						if(i%SKIP_FOR_ROW==0 && j%SKIP_FOR_COL==0){
 							if(line_pic_send)
-								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_LINE] = 0;
+								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 0;
 							else
-								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_LINE] = 0;
+								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 0;
 						}
 					}
 					else
 					{
 						LCD->LCD_RAM=BLACK;
-						if(i%SKIP_FOR_ROW==0 && j%SKIP_FOR_LINE==0){
+						if(i%SKIP_FOR_ROW==0 && j%SKIP_FOR_COL==0){
 							if(line_pic_send)
-								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_LINE] = 1;
+								line_pic1[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 1;
 							else
-								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_LINE] = 1;
+								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 1;
 						}
 					}
 
