@@ -37,7 +37,7 @@ void camera_init(void)
     DCMI_DMA_Init(rgb_buf,sizeof(rgb_buf)/4,DMA_MemoryDataSize_HalfWord,DMA_MemoryInc_Enable);//DCMI DMA配置
     DCMI_Start(); 		//启动传输 
 	OV2640_Special_Effects(2);
-	set_ov2640_led_state(0);
+	set_ov2640_led_state(1);
 }
 
 void update_threshold_through_key(void)
@@ -86,7 +86,9 @@ void vTaskCameraCapture(void *pvParameters)
 						LCD_SetCursor(LCD_X_MOVE,i+1+LCD_Y_MOVE);  
 						LCD_WriteRAM_Prepare();		//开始写入GRAM
 					}
-					//	LCD->LCD_RAM=rgb_buf[i][j];
+#if 0
+					LCD->LCD_RAM=rgb_buf[i][j];
+#else
 					gray=((rgb_buf[ROW_A-i][COL_B-j]>>11)*19595+((rgb_buf[ROW_A-i][COL_B-j]>>5)&0x3f)*38469 +(rgb_buf[ROW_A-i][COL_B-j]&0x1f)*7472)>>16;
 					if(gray<=MAX_threshold&&gray>=MIN_threshold)                                   //这里是图像黑白二值化
 					{
@@ -108,6 +110,7 @@ void vTaskCameraCapture(void *pvParameters)
 								line_pic0[i/SKIP_FOR_ROW][j/SKIP_FOR_COL] = 0;
 						}
 					}
+#endif
 
 				}
 			}
