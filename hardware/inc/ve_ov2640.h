@@ -1,29 +1,25 @@
 #ifndef _OV2640_H
 #define _OV2640_H
 #include "camera.h"
-#if USE_F407ZG_BOARD == 1
+// #if deined(USE_F407VE_BOARD) && USE_F407VE_BOARD
+#if USE_F407VE_BOARD == 1
+#include "sys.h"
 #include "sccb.h"
-void start(void);
 //////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32F407开发板
+
 //OV2640 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2014/5/14
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
-//All rights reserved									  
+							  
 ////////////////////////////////////////////////////////////////////////////////// 
 
-#define OV2640_PWDN  	PGout(9)			//POWER DOWN控制信号 
-#define OV2640_RST  	PGout(15)			//复位控制信号 
+#define OV2640_PWDN  	PAout(7)			//POWER DOWN控制信号 :PA7
+#define OV2640_RST  	PCout(4)			//复位控制信号    :PC4
+
+#define OV2640_LED_light  	PBout(8)			//补光LED灯控制引脚
 ////////////////////////////////////////////////////////////////////////////////// 
 #define OV2640_MID				0X7FA2
-#define OV2640_PID				0X2642
+#define OV2640_PID1				0X2642
+#define OV2640_PID2				0X2641
  
-#define OV2640_LED_light  	PFout(8)			//补光LED灯控制引脚
 
 //当选择DSP地址(0XFF=0X00)时,OV2640的DSP寄存器地址映射表
 #define OV2640_DSP_R_BYPASS     0x05
@@ -112,41 +108,21 @@ void start(void);
 
 								
 	    				 
-uint8_t OV2640_Init(void);  
+u8 OV2640_Init(void);  
 void OV2640_JPEG_Mode(void);
 void OV2640_RGB565_Mode(void);
-void OV2640_Auto_Exposure(uint8_t level);
-void OV2640_Light_Mode(uint8_t mode);
-void OV2640_Color_Saturation(uint8_t sat);
-void OV2640_Brightness(uint8_t bright);
-void OV2640_Contrast(uint8_t contrast);
-void OV2640_Special_Effects(uint8_t eft);
-void OV2640_Color_Bar(uint8_t sw);
-void OV2640_Window_Set(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height);
-uint8_t OV2640_OutSize_Set(uint16_t width,uint16_t height);
-uint8_t OV2640_ImageWin_Set(uint16_t offx,uint16_t offy,uint16_t width,uint16_t height);
-uint8_t OV2640_ImageSize_Set(uint16_t width,uint16_t height);
-void OV2640_YUV422_Mode(void);
-void set_ov2640_led_state(uint8_t led_state);
-#endif
+void OV2640_Auto_Exposure(u8 level);
+void OV2640_Light_Mode(u8 mode);
+void OV2640_Color_Saturation(u8 sat);
+void OV2640_Brightness(u8 bright);
+void OV2640_Contrast(u8 contrast);
+void OV2640_Special_Effects(u8 eft);
+void OV2640_Color_Bar(u8 sw);
+void OV2640_Window_Set(u16 sx,u16 sy,u16 width,u16 height);
+u8 OV2640_OutSize_Set(u16 width,u16 height);
+u8 OV2640_ImageWin_Set(u16 offx,u16 offy,u16 width,u16 height);
+u8 OV2640_ImageSize_Set(u16 width,u16 height);
 
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif

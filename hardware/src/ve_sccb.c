@@ -1,38 +1,37 @@
 #include "camera.h"
-#if USE_F407ZG_BOARD == 1
-#include "sccb.h"
+// #if deined(USE_F407VE_BOARD) && USE_F407VE_BOARD
+#if USE_F407VE_BOARD == 1
 #include "sys.h"
+#include "ve_sccb.h"
 #include "delay.h"
 //////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32F407开发板
+
 //OV系列摄像头 SCCB 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2014/5/14
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
-//All rights reserved									  
+							  
 ////////////////////////////////////////////////////////////////////////////////// 
+
+
 
 //初始化SCCB接口 
 void SCCB_Init(void)
 {				
   GPIO_InitTypeDef  GPIO_InitStructure;
 
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);//使能GPIOD时钟
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);//使能GPIOB时钟
   //GPIOF9,F10初始化设置
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7;//PD6,7 推挽输出
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;  //PD6,7 推挽输出
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10|GPIO_Pin_11;//PB10,PB11 推挽输出
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;  //推挽输出
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//100MHz
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
-  GPIO_Init(GPIOD, &GPIO_InitStructure);//初始化
+  GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化
  
-	GPIO_SetBits(GPIOD,GPIO_Pin_6|GPIO_Pin_7);
+	GPIO_SetBits(GPIOB,GPIO_Pin_10|GPIO_Pin_11);
 	SCCB_SDA_OUT();	   
-}			 
+}		
+
+
+
 
 //SCCB起始信号
 //当时钟为高的时候,数据线的高到低,为SCCB起始信号
@@ -73,9 +72,9 @@ void SCCB_No_Ack(void)
 }
 //SCCB,写入一个字节
 //返回值:0,成功;1,失败. 
-uint8_t SCCB_WR_Byte(uint8_t dat)
+u8 SCCB_WR_Byte(u8 dat)
 {
-	uint8_t j,res;	 
+	u8 j,res;	 
 	for(j=0;j<8;j++) //循环8次发送数据
 	{
 		if(dat&0x80)SCCB_SDA=1;	
@@ -99,9 +98,9 @@ uint8_t SCCB_WR_Byte(uint8_t dat)
 //SCCB 读取一个字节
 //在SCL的上升沿,数据锁存
 //返回值:读到的数据
-uint8_t SCCB_RD_Byte(void)
+u8 SCCB_RD_Byte(void)
 {
-	uint8_t temp=0,j;    
+	u8 temp=0,j;    
 	SCCB_SDA_IN();		//设置SDA为输入  
 	for(j=8;j>0;j--) 	//循环8次接收数据
 	{		     	  
@@ -117,9 +116,9 @@ uint8_t SCCB_RD_Byte(void)
 } 							    
 //写寄存器
 //返回值:0,成功;1,失败.
-uint8_t SCCB_WR_Reg(uint8_t reg,uint8_t data)
+u8 SCCB_WR_Reg(u8 reg,u8 data)
 {
-	uint8_t res=0;
+	u8 res=0;
 	SCCB_Start(); 					//启动SCCB传输
 	if(SCCB_WR_Byte(SCCB_ID))res=1;	//写器件ID	  
 	delay_us(100);
@@ -131,9 +130,9 @@ uint8_t SCCB_WR_Reg(uint8_t reg,uint8_t data)
 }		  					    
 //读寄存器
 //返回值:读到的寄存器值
-uint8_t SCCB_RD_Reg(uint8_t reg)
+u8 SCCB_RD_Reg(u8 reg)
 {
-	uint8_t val=0;
+	u8 val=0;
 	SCCB_Start(); 				//启动SCCB传输
 	SCCB_WR_Byte(SCCB_ID);		//写器件ID	  
 	delay_us(100);	 
@@ -152,16 +151,3 @@ uint8_t SCCB_RD_Reg(uint8_t reg)
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,23 +1,21 @@
 #include "camera.h"
-#if USE_F407ZG_BOARD == 1
-#include "ov2640.h"
-#include "ov2640cfg.h"
-//#include "timer.h"	  
-#include "sccb.h"	
-#include "lcd.h"
+// #if deined(USE_F407VE_BOARD) && USE_F407VE_BOARD
+#if USE_F407VE_BOARD == 1
+#include "sys.h"
+#include "ve_ov2640.h"
+#include "ve_ov2640cfg.h"
+// #include "timer.h"	  
+#include "delay.h"
+#include "usart.h"			 
+#include "ve_sccb.h"	
+#include "ve_lcd.h"
  
 //////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32F407开发板
+
 //OV2640 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2014/5/14
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
-//All rights reserved									  
+						  
 ////////////////////////////////////////////////////////////////////////////////// 
+  
   
 //初始化OV2640 
 //配置完以后,默认输出是1600*1200尺寸的图片!! 
@@ -46,30 +44,52 @@ void start(void)
 	delay_ms(100);
 }
 
-
-uint8_t OV2640_Init(void)
+//初始化OV2640 
+//配置完以后,默认输出是1600*1200尺寸的图片!! 
+//返回值:0,成功
+//    其他,错误代码
+u8 OV2640_Init(void)
 { 
-	uint16_t i=0;
-	uint16_t reg;
-	//设置IO     	 
+	u16 i=0;
+	u16 reg;
+	//设置IO     	   
   GPIO_InitTypeDef  GPIO_InitStructure;
 
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
-  //GPIOG9,15初始化设置
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9|GPIO_Pin_15;//PG9,15推挽输出
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC, ENABLE);
+  //初始化设置
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;//PWDN:PA7  推挽输出
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; //推挽输出
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//100MHz
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
-  GPIO_Init(GPIOG, &GPIO_InitStructure);//初始化
- 
-	// for ov2640 camera light led
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;//PF8推挽输出
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; //推挽输出
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//100MHz
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
-	GPIO_Init(GPIOF, &GPIO_InitStructure);//初始化
+  GPIO_Init(GPIOA, &GPIO_InitStructure);//初始化
+	
+	  //初始化设置
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;//RESET:PC4  推挽输出
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; //推挽输出
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//100MHz
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
+  GPIO_Init(GPIOC, &GPIO_InitStructure);//初始化
+
+
+
+	  //PF8初始化设置：PF8用于控制摄像头补光高亮LED灯，高电平点亮，低电平灭
+	
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;//PF8推挽输出
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; //推挽输出
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//100MHz
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
+  GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化
+	
+	OV2640_LED_light=0;//关闭补光LED
+	OV2640_LED_light=1;//开启补光LED
+	OV2640_LED_light=0;//关闭补光LED
+	OV2640_LED_light=1;//开启补光LED
+
+
+
 
  	OV2640_PWDN=0;	//POWER ON
 	delay_ms(10);
@@ -91,15 +111,18 @@ uint8_t OV2640_Init(void)
 	reg=SCCB_RD_Reg(OV2640_SENSOR_PIDH);	//读取厂家ID 高八位
 	reg<<=8;
 	reg|=SCCB_RD_Reg(OV2640_SENSOR_PIDL);	//读取厂家ID 低八位
-	if(reg!=OV2640_PID)
+	if((reg!=OV2640_PID1)&(reg!=OV2640_PID2))
 	{
 		printf("HID:%d\r\n",reg);
 		return 2;
 	}   
  	//初始化 OV2640,采用SXGA分辨率(1600*1200)  
-	for(i=0;i<sizeof(ov2640_svga_init_reg_tbl)/2;i++)
+	for(i=0;i<sizeof(ov2640_sxga_init_reg_tbl)/2;i++)
 	{
-	   	SCCB_WR_Reg(ov2640_svga_init_reg_tbl[i][0],ov2640_svga_init_reg_tbl[i][1]);
+	   	SCCB_WR_Reg(ov2640_sxga_init_reg_tbl[i][0],ov2640_sxga_init_reg_tbl[i][1]);
+		  
+		  if(i<10)delay_ms(5);//写入初始几个数据的时候，加延时，参数设置不出错
+		
  	} 
   	return 0x00; 	//ok
 } 
@@ -117,7 +140,7 @@ void set_ov2640_led_state(uint8_t led_state)
 //OV2640切换为JPEG模式
 void OV2640_JPEG_Mode(void) 
 {
-	uint16_t i=0;
+	u16 i=0;
 	//设置:YUV422格式
 	for(i=0;i<(sizeof(ov2640_yuv422_reg_tbl)/2);i++)
 	{
@@ -133,23 +156,15 @@ void OV2640_JPEG_Mode(void)
 //OV2640切换为RGB565模式
 void OV2640_RGB565_Mode(void) 
 {
-	uint16_t i=0;
+	u16 i=0;
 	//设置:RGB565输出
 	for(i=0;i<(sizeof(ov2640_rgb565_reg_tbl)/2);i++)
 	{
 		SCCB_WR_Reg(ov2640_rgb565_reg_tbl[i][0],ov2640_rgb565_reg_tbl[i][1]); 
 	} 
 } 
-
-void OV2640_YUV422_Mode(void)//设置OV2640输出YUV422.（YUYV）格式（16位数据的高字节为亮度值Y）
-{
-        SCCB_WR_Reg(0xff, 0x00);  //要设置0xDA寄存器，必须让0xFF=0x00
-
-        SCCB_WR_Reg(0xda, 0x01);//设置OV2640输出YUYV格式
-
-}
 //自动曝光设置参数表,支持5个等级
-const static uint8_t OV2640_AUTOEXPOSURE_LEVEL[5][8]=
+const static u8 OV2640_AUTOEXPOSURE_LEVEL[5][8]=
 {
 	{
 		0xFF,0x01,
@@ -184,10 +199,10 @@ const static uint8_t OV2640_AUTOEXPOSURE_LEVEL[5][8]=
 }; 
 //OV2640自动曝光等级设置
 //level:0~4
-void OV2640_Auto_Exposure(uint8_t level)
+void OV2640_Auto_Exposure(u8 level)
 {  
-	uint8_t i;
-	uint8_t *p=(uint8_t*)OV2640_AUTOEXPOSURE_LEVEL[level];
+	u8 i;
+	u8 *p=(u8*)OV2640_AUTOEXPOSURE_LEVEL[level];
 	for(i=0;i<4;i++)
 	{ 
 		SCCB_WR_Reg(p[i*2],p[i*2+1]); 
@@ -199,16 +214,16 @@ void OV2640_Auto_Exposure(uint8_t level)
 //2,阴天cloudy
 //3,办公室office
 //4,家里home
-void OV2640_Light_Mode(uint8_t mode)
+void OV2640_Light_Mode(u8 mode)
 {
-	uint8_t regccval=0X5E;//Sunny 
-	uint8_t regcdval=0X41;
-	uint8_t regceval=0X54;
+	u8 regccval=0X5E;//Sunny 
+	u8 regcdval=0X41;
+	u8 regceval=0X54;
 	switch(mode)
 	{ 
 		case 0://auto 
 			SCCB_WR_Reg(0XFF,0X00);	 
-			SCCB_WR_Reg(0XC7,0X10);//AWB ON 
+			SCCB_WR_Reg(0XC7,0X00);//AWB ON 
 			return;  	
 		case 2://cloudy
 			regccval=0X65;
@@ -238,9 +253,9 @@ void OV2640_Light_Mode(uint8_t mode)
 //2,0
 //3,+1
 //4,+2
-void OV2640_Color_Saturation(uint8_t sat)
+void OV2640_Color_Saturation(u8 sat)
 { 
-	uint8_t reg7dval=((sat+2)<<4)|0X08;
+	u8 reg7dval=((sat+2)<<4)|0X08;
 	SCCB_WR_Reg(0XFF,0X00);		
 	SCCB_WR_Reg(0X7C,0X00);		
 	SCCB_WR_Reg(0X7D,0X02);				
@@ -254,7 +269,7 @@ void OV2640_Color_Saturation(uint8_t sat)
 //2,(0X20) 0
 //3,(0X30)+1
 //4,(0X40)+2
-void OV2640_Brightness(uint8_t bright)
+void OV2640_Brightness(u8 bright)
 {
   SCCB_WR_Reg(0xff, 0x00);
   SCCB_WR_Reg(0x7c, 0x00);
@@ -269,10 +284,10 @@ void OV2640_Brightness(uint8_t bright)
 //2,0
 //3,+1
 //4,+2
-void OV2640_Contrast(uint8_t contrast)
+void OV2640_Contrast(u8 contrast)
 {
-	uint8_t reg7d0val=0X20;//默认为普通模式
-	uint8_t reg7d1val=0X20;
+	u8 reg7d0val=0X20;//默认为普通模式
+	u8 reg7d1val=0X20;
   	switch(contrast)
 	{
 		case 0://-2
@@ -309,11 +324,11 @@ void OV2640_Contrast(uint8_t contrast)
 //4,偏绿色
 //5,偏蓝色
 //6,复古	    
-void OV2640_Special_Effects(uint8_t eft)
+void OV2640_Special_Effects(u8 eft)
 {
-	uint8_t reg7d0val=0X00;//默认为普通模式
-	uint8_t reg7d1val=0X80;
-	uint8_t reg7d2val=0X80; 
+	u8 reg7d0val=0X00;//默认为普通模式
+	u8 reg7d1val=0X80;
+	u8 reg7d2val=0X80; 
 	switch(eft)
 	{
 		case 1://负片
@@ -353,9 +368,9 @@ void OV2640_Special_Effects(uint8_t eft)
 //彩条测试
 //sw:0,关闭彩条
 //   1,开启彩条(注意OV2640的彩条是叠加在图像上面的)
-void OV2640_Color_Bar(uint8_t sw)
+void OV2640_Color_Bar(u8 sw)
 {
-	uint8_t reg;
+	u8 reg;
 	SCCB_WR_Reg(0XFF,0X01);
 	reg=SCCB_RD_Reg(0X12);
 	reg&=~(1<<1);
@@ -365,11 +380,11 @@ void OV2640_Color_Bar(uint8_t sw)
 //设置图像输出窗口 
 //sx,sy,起始地址
 //width,height:宽度(对应:horizontal)和高度(对应:vertical)
-void OV2640_Window_Set(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height)
+void OV2640_Window_Set(u16 sx,u16 sy,u16 width,u16 height)
 {
-	uint16_t endx;
-	uint16_t endy;
-	uint8_t temp; 
+	u16 endx;
+	u16 endy;
+	u8 temp; 
 	endx=sx+width/2;	//V*2
  	endy=sy+height/2;
 	
@@ -389,19 +404,25 @@ void OV2640_Window_Set(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height)
 	SCCB_WR_Reg(0X18,endx>>3);			//设置Href的end的高8位
 }
 //设置图像输出大小
+
 //OV2640输出图像的大小(分辨率),完全由改函数确定
 //width,height:宽度(对应:horizontal)和高度(对应:vertical),width和height必须是4的倍数
 //返回值:0,设置成功
 //    其他,设置失败
-uint8_t OV2640_OutSize_Set(uint16_t width,uint16_t height)
+
+
+u8 OV2640_OutSize_Set(u16 width,u16 height)
 {
-	uint16_t outh;
-	uint16_t outw;
-	uint8_t temp; 
+	u16 outh;
+	u16 outw;
+	u8 temp; 
+	
 	if(width%4)return 1;
 	if(height%4)return 2;
+	
 	outw=width/4;
 	outh=height/4; 
+	
 	SCCB_WR_Reg(0XFF,0X00);	
 	SCCB_WR_Reg(0XE0,0X04);			
 	SCCB_WR_Reg(0X5A,outw&0XFF);		//设置OUTW的低八位
@@ -421,11 +442,11 @@ uint8_t OV2640_OutSize_Set(uint16_t width,uint16_t height)
 //width,height:宽度(对应:horizontal)和高度(对应:vertical),width和height必须是4的倍数
 //返回值:0,设置成功
 //    其他,设置失败
-uint8_t OV2640_ImageWin_Set(uint16_t offx,uint16_t offy,uint16_t width,uint16_t height)
+u8 OV2640_ImageWin_Set(u16 offx,u16 offy,u16 width,u16 height)
 {
-	uint16_t hsize;
-	uint16_t vsize;
-	uint8_t temp; 
+	u16 hsize;
+	u16 vsize;
+	u8 temp; 
 	if(width%4)return 1;
 	if(height%4)return 2;
 	hsize=width/4;
@@ -450,9 +471,9 @@ uint8_t OV2640_ImageWin_Set(uint16_t offx,uint16_t offy,uint16_t width,uint16_t 
 //width,height:图像宽度和图像高度
 //返回值:0,设置成功
 //    其他,设置失败
-uint8_t OV2640_ImageSize_Set(uint16_t width,uint16_t height)
+u8 OV2640_ImageSize_Set(u16 width,u16 height)
 { 
-	uint8_t temp; 
+	u8 temp; 
 	SCCB_WR_Reg(0XFF,0X00);			
 	SCCB_WR_Reg(0XE0,0X04);			
 	SCCB_WR_Reg(0XC0,(width)>>3&0XFF);		//设置HSIZE的10:3位
@@ -466,18 +487,3 @@ uint8_t OV2640_ImageSize_Set(uint16_t width,uint16_t height)
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

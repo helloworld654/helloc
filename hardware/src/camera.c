@@ -1,7 +1,12 @@
 #include "camera.h"
+#if USE_F407ZG_BOARD == 1
+#include "lcd.h"
+#endif
+#if USE_F407VE_BOARD == 1
+#include "ve_lcd.h"
+#endif
 #include "includes.h"
 #include "following.h"
-#include "lcd.h"
 #include "key.h"
 
 #define LCD_X_MOVE    25

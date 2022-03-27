@@ -1,5 +1,7 @@
 #ifndef __LCD_H
 #define __LCD_H		
+#include "camera.h"
+#if USE_F407ZG_BOARD == 1
 #include "sys.h"
 #include "bsp.h"
 #include "stdlib.h" 
@@ -199,7 +201,7 @@ void LCD_Set_Window(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height);	//É
 
 #endif  
 	 
-	 
+#endif	 
 
 
 

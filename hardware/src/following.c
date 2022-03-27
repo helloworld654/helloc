@@ -219,7 +219,7 @@ uint8_t black_line_process(void)
 	{
 		getOneSideUsefulLine(leftBlackLoc,countLeftZero,maxUsefulLeftLineX,maxUsefulLeftLineY,&maxUsefulLeftLength);
 		line_regression_calcu(maxUsefulLeftLineX,maxUsefulLeftLineY,maxUsefulLeftLength,&left_K,&left_B);
-#if 1
+#if 0
 		printf("the left info left_K:%f,left_B:%d\r\n",left_K,left_B);
 #endif
 #if 0

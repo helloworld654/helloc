@@ -1,35 +1,33 @@
 #ifndef _OV2640CFG_H
 #define _OV2640CFG_H
 #include "camera.h"
-#if USE_F407ZG_BOARD == 1
+// #if deined(USE_F407VE_BOARD) && USE_F407VE_BOARD
+#if USE_F407VE_BOARD == 1
 #include "ov2640.h" 
 //////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32F407开发板
+
 //OV2640 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2014/5/14
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
-//All rights reserved									  
+							  
 ////////////////////////////////////////////////////////////////////////////////// 
 
 //OV2640 SXGA初始化寄存器序列表
-//此模式下帧率为15帧
+
 //SXGA(1600*1200) 
 const u8 ov2640_sxga_init_reg_tbl[][2]= 
-{   
+{
+ 	0xff, 0x01,
+	0x12, 0x80,
+
+  // 	
 	0xff, 0x00,
 	0x2c, 0xff,
 	0x2e, 0xdf,
 	0xff, 0x01,
 	0x3c, 0x32,
 	//
-	0x11, 0x00,
+	0x11, 0x01,//此处01设置为0的时候，可以提高摄像头帧数，但是，设置高频帧数的时候，会导致显示刷新时间不够，显示错位花屏
 	0x09, 0x02,
-	0x04, 0xD8,//水平镜像,垂直翻转
+	0x04, 0x20,//水平镜像,垂直翻转 可以通过位配置，来调整扫描方式   Bit[7]: 控制水平扫描方式    Bit[6]: 控制纵向扫描方式
 	0x13, 0xe5,
 	0x14, 0x48,
 	0x2c, 0x0c,
@@ -239,7 +237,7 @@ const u8 ov2640_svga_init_reg_tbl[][2]=
 	//
 	0x11, 0x00,
 	0x09, 0x02,
-	0x04, 0xD8,//水平镜像,垂直翻转
+	0x04, 0x20,//水平镜像,垂直翻转 可以通过位配置，来调整扫描方式   Bit[7]: 控制水平扫描方式    Bit[6]: 控制纵向扫描方式
 	0x13, 0xe5,
 	0x14, 0x48,
 	0x2c, 0x0c,
@@ -432,72 +430,6 @@ const u8 ov2640_svga_init_reg_tbl[][2]=
 	0xdd, 0x7f,
 	0x05, 0x00,
 };   
-
-/* ---------------------------------------------------------------------------*/
-/* CIF 400x300 60fps */
-const uint8_t OV2640_400X300_60D0[][2] =
-{
-	0xFF, 0x01, // BANK_SEL_SENSOR
-	0x11, 0x00, // 影响帧率 (fps = 60 / (CLKRC[5:0] + 1))
-	0x12, 0x20, // Bit[6:4]:Resolution Selection 010:CIF
-	0x3D, 0x38, //
-	// 12000000 = 60.0 * (595) * (336)
-	0x2A, 0x00, // Bit[7:4]: Line interval adjust value 4 MSBs
-	0x2B, 0x00, // Line interval adjustment value LSB 8 bits
-	0x46, 0x00, // FLL:Frame Length Adjustment LSBs
-	0x47, 0x00, // FLH:Frame Length Adjustment MSBs
-	
-	// Sensor Window (274, 4, 800, 600)
-	0x17, 0x11, // HREFST[10:3]
-	0x18, 0x43, // HREFEND[10:3]
-	0x32, 0x09, // Bit[5:3]: HREFEND[2:0]; Bit[2:0]: HREFST[2:0]
-	
-	0x19, 0x00, // VSTRT[9:2]
-	0x1A, 0x4B, // VEND[9:2]
-	0x03, 0x0A, // Bit[3:2]: VEND[1:0]; Bit[1:0]: VSTRT[1:0]
-	
-	0x37, 0x40,	
-	0x4F, 0xBB, // 50Hz Banding AEC 8 LSBs
-	0x50, 0x9C, // 60Hz Banding AEC 8 LSBs
-	0x5A, 0x57, // 6 step for 50Hz, 8 step for 60Hz
-	0x6D, 0x80,
-	
-	0x39, 0x02,
-	0x35, 0x88,
-	0x22, 0x0A,
-	0x34, 0xA0, // ARCOM2
-	0x06, 0x02,
-	0x0D, 0xB7,
-	0x0E, 0x01,
-//-----------------------------------------------
-	0xFF, 0x00, // BANK_SEL_DSP
-	0xE0, 0x04, // RESET (DVP:Digital Video Port)
-	
-	// Image Size (800, 600)
-	0xC0, 0x64,
-	0xC1, 0x4B,
-	0x8C, 0x00,
-	
-	// Image Window (0, 0, 800, 300)
-	0x51, 0xC8,
-	0x52, 0x4B,
-	0x53, 0x00,
-	0x54, 0x00,
-	0x55, 0x00,
-	0x57, 0x00,
-	
-	// Out Size (400, 300)
-	0x5A, 0x64,
-	0x5B, 0x4B,
-	0x5C, 0x00,
-	
-	0x86, 0x3D, // CTRL2: Module Enable 0011 1101
-	0x50, 0x00, // CTRLI: LP_DP = 0, V_DIVIDER = 0, H_DIVIDER = 0
-	0xD3, 0x04, // R_DVP_SP DVP PCLK = sysclk(48)/[6:0] (YUV0)
-	
-	0xE0, 0x00,
-};
-
 const u8 ov2640_jpeg_reg_tbl[][2]=
 {
 	0xff, 0x01, 
@@ -541,20 +473,3 @@ const u8 ov2640_yuv422_reg_tbl[][2]=
 #endif
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

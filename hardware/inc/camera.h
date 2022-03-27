@@ -1,6 +1,9 @@
 #ifndef __CAMERA_H
 #define __CAMERA_H	
 
+#define USE_F407ZG_BOARD    0
+#define USE_F407VE_BOARD    1
+
 // #define ROW_A    240
 // #define COL_B    240
 #define ROW_A    180
