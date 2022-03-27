@@ -30,7 +30,7 @@ void camera_init(void)
     DCMI_DMA_Init(rgb_buf,sizeof(rgb_buf)/4,DMA_MemoryDataSize_HalfWord,DMA_MemoryInc_Enable);//DCMI DMA配置
     DCMI_Start(); 		//启动传输 
 	OV2640_Special_Effects(2);
-	set_ov2640_led_state(1);
+	set_ov2640_led_state(0);
 }
 
 void update_threshold_through_key(void)
