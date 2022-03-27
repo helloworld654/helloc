@@ -14,6 +14,6 @@
 
 void camera_init(void);
 void update_threshold_through_key(void);
-void vTaskStart(void *pvParameters);
+void vTaskCameraCapture(void *pvParameters);
 
 #endif

@@ -67,8 +67,8 @@
 **********************************************************************************************************
 */
 static void vTaskTaskUserIF(void *pvParameters);
-static void vTaskLED(void *pvParameters);
-static void vTaskMsgPro(void *pvParameters);
+static void vTaskFPScalcu(void *pvParameters);
+static void vTaskKeyCapture(void *pvParameters);
 static void AppTaskCreate (void);
 static void AppObjCreate (void);
 
@@ -178,7 +178,7 @@ static void vTaskTaskUserIF(void *pvParameters)
 
 /*
 *********************************************************************************************************
-*	函 数 名: vTaskLED
+*	函 数 名: vTaskFPScalcu
 *	功能说明: LED闪烁	
 *	形    参: pvParameters 是在创建该任务时传递的形参
 *	返 回 值: 无
@@ -186,7 +186,7 @@ static void vTaskTaskUserIF(void *pvParameters)
 *********************************************************************************************************
 */
 extern uint16_t fps_recording;
-static void vTaskLED(void *pvParameters)
+static void vTaskFPScalcu(void *pvParameters)
 {
 	uint8_t num = 0;
 	bsp_LedOn(2);
@@ -204,14 +204,14 @@ static void vTaskLED(void *pvParameters)
 
 /*
 *********************************************************************************************************
-*	函 数 名: vTaskMsgPro
+*	函 数 名: vTaskKeyCapture
 *	功能说明: 信息处理，这里是用作LED闪烁	
 *	形    参: pvParameters 是在创建该任务时传递的形参
 *	返 回 值: 无
 *   优 先 级: 3  
 *********************************************************************************************************
 */
-static void vTaskMsgPro(void *pvParameters)
+static void vTaskKeyCapture(void *pvParameters)
 {
 	KEY_Init();
     while(1)
@@ -239,30 +239,30 @@ static void AppTaskCreate (void)
     //              &xHandleTaskUserIF );  /* 任务句柄  */
 	
 	
-	xTaskCreate( vTaskLED,    		/* 任务函数  */
-                 "vTaskLED",  		/* 任务名    */
+	xTaskCreate( vTaskFPScalcu,    		/* 任务函数  */
+                 "vTaskFPScalcu",  		/* 任务名    */
                  512,         		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,        		/* 任务参数  */
                  4,           		/* 任务优先级*/
                  &xHandleTaskLED ); /* 任务句柄  */
 	
-	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
-                 "vTaskMsgPro",   		/* 任务名    */
+	xTaskCreate( vTaskKeyCapture,     		/* 任务函数  */
+                 "vTaskKeyCapture",   		/* 任务名    */
                  512,             		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  4,               		/* 任务优先级*/
                  &xHandleTaskMsgPro );  /* 任务句柄  */
 	
 	
-	xTaskCreate( vTaskStart,     		/* 任务函数  */
-                 "vTaskStart",   		/* 任务名    */
+	xTaskCreate( vTaskCameraCapture,     		/* 任务函数  */
+                 "vTaskCameraCapture",   		/* 任务名    */
                  1024,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  3,              		/* 任务优先级*/
                  &xHandleTaskStart );   /* 任务句柄  */
 
-	xTaskCreate( vTaskFollowing,     		/* 任务函数  */
-                 "vTaskFollowing",   		/* 任务名    */
+	xTaskCreate( vTaskLineProcess,     		/* 任务函数  */
+                 "vTaskLineProcess",   		/* 任务名    */
                  512,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  3,              		/* 任务优先级*/

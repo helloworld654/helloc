@@ -1,6 +1,6 @@
 #ifndef __FOLLOWING_H
 #define __FOLLOWING_H
 
-void vTaskFollowing(void *pvParameters);
+void vTaskLineProcess(void *pvParameters);
 
 #endif

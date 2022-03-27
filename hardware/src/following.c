@@ -244,7 +244,7 @@ uint8_t black_line_process(void)
 	return 1;
 }
 
-void vTaskFollowing(void *pvParameters)
+void vTaskLineProcess(void *pvParameters)
 {
     uint8_t line_picN,ready;
 	xQueueSend(xQueueCameraReady,&ready,3000);

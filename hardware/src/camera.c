@@ -57,7 +57,7 @@ void update_threshold_through_key(void)
 	}
 }
 
-void vTaskStart(void *pvParameters)
+void vTaskCameraCapture(void *pvParameters)
 {
 	uint8_t i,j,line_pic_send,line_pic_num,ready;
 	uint16_t gray;
