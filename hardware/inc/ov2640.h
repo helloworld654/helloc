@@ -125,6 +125,7 @@ uint8_t OV2640_OutSize_Set(uint16_t width,uint16_t height);
 uint8_t OV2640_ImageWin_Set(uint16_t offx,uint16_t offy,uint16_t width,uint16_t height);
 uint8_t OV2640_ImageSize_Set(uint16_t width,uint16_t height);
 void OV2640_YUV422_Mode(void);
+void set_ov2640_led_state(uint8_t led_state);
 #endif
 
 

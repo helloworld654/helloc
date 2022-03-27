@@ -68,11 +68,6 @@ uint8_t OV2640_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//100MHz
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
 	GPIO_Init(GPIOF, &GPIO_InitStructure);//初始化
-	
-	OV2640_LED_light=0;//关闭补光LED
-	OV2640_LED_light=1;//开启补光LED
-	OV2640_LED_light=0;//关闭补光LED
-	OV2640_LED_light=1;//开启补光LED
 
  	OV2640_PWDN=0;	//POWER ON
 	delay_ms(10);
@@ -106,6 +101,17 @@ uint8_t OV2640_Init(void)
  	} 
   	return 0x00; 	//ok
 } 
+
+void set_ov2640_led_state(uint8_t led_state)
+{
+	if(led_state){
+		OV2640_LED_light = 1;
+	}
+	else{
+		OV2640_LED_light = 0;
+	}
+}
+
 //OV2640切换为JPEG模式
 void OV2640_JPEG_Mode(void) 
 {

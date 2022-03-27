@@ -14,7 +14,9 @@ extern QueueHandle_t xQueueLineProcess;
 extern QueueHandle_t xQueueCameraReady;
 
 uint16_t rgb_buf[ROW_A][COL_B] = {0};
-uint8_t MAX_threshold=47,MIN_threshold=29 ;
+// uint8_t MAX_threshold=47,MIN_threshold=29 ;
+uint8_t MAX_threshold=47;
+uint8_t MIN_threshold=10;   //  on window for night led is on
 
 void camera_init(void)
 {
@@ -28,6 +30,7 @@ void camera_init(void)
     DCMI_DMA_Init(rgb_buf,sizeof(rgb_buf)/4,DMA_MemoryDataSize_HalfWord,DMA_MemoryInc_Enable);//DCMI DMA配置
     DCMI_Start(); 		//启动传输 
 	OV2640_Special_Effects(2);
+	set_ov2640_led_state(1);
 }
 
 void update_threshold_through_key(void)
@@ -43,7 +46,7 @@ void update_threshold_through_key(void)
 			case KEY1_PRES :MIN_threshold--;
 			  	printf("get the key1\r\n");
 				break;
-			case WKUP_PRES :MAX_threshold--;
+			case WKUP_PRES :MAX_threshold++;
 			  	printf("get the wkup\r\n");
 				break;
 			default:

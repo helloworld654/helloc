@@ -31,28 +31,43 @@ void getLineEdge(uint8_t p_line_pic[][COL_B/SKIP_FOR_COL])
 		right_loc_get = 0;
 		for(tempCol = 0;tempCol < COL_B/SKIP_FOR_COL - 4;tempCol ++)  //连续判断三个点，所以最后三个点舍去
 		{
-			if(p_line_pic[tmpRow][tempCol]==1 && p_line_pic[tmpRow][tempCol+1]== 0 && 
-				p_line_pic[tmpRow][tempCol+2]==0 && p_line_pic[tmpRow][tempCol+3]==0)
-			{
-				left_loc_get = 1;
-				leftBlackLoc[tmpRow] = tempCol+1;
-                tempCol += 2;
-                continue;
+			if(tempCol == 0){
+				if(p_line_pic[tmpRow][tempCol]==0 && p_line_pic[tmpRow][tempCol+1]== 0 && p_line_pic[tmpRow][tempCol+2]==0)
+				{
+					left_loc_get = 1;
+					leftBlackLoc[tmpRow] = tempCol;
+					tempCol += 2;
+					continue;
+				}
 			}
-            if(p_line_pic[tmpRow][tempCol]==0 && p_line_pic[tmpRow][tempCol+1]== 1 && 
-				p_line_pic[tmpRow][tempCol+2]==1 && p_line_pic[tmpRow][tempCol+3]==1)
-			{
-				right_loc_get = 1;
-				rightBlackLoc[tmpRow] = tempCol+1;
-                tempCol += 2;
-                continue;
+			if(!left_loc_get){
+				if(p_line_pic[tmpRow][tempCol]==1 && p_line_pic[tmpRow][tempCol+1]== 0 && 
+					p_line_pic[tmpRow][tempCol+2]==0 && p_line_pic[tmpRow][tempCol+3]==0)
+				{
+					left_loc_get = 1;
+					leftBlackLoc[tmpRow] = tempCol+1;
+					tempCol += 2;
+					continue;
+				}
 			}
+			if(!right_loc_get){
+				if(p_line_pic[tmpRow][tempCol]==0 && p_line_pic[tmpRow][tempCol+1]== 1 && 
+					p_line_pic[tmpRow][tempCol+2]==1 && p_line_pic[tmpRow][tempCol+3]==1)
+				{
+					right_loc_get = 1;
+					rightBlackLoc[tmpRow] = tempCol+1;
+					tempCol += 2;
+					continue;
+				}
+			}
+			if(left_loc_get==1 && right_loc_get==1)
+				break;
 		}
 		if(left_loc_get == 0){
-			leftBlackLoc[tmpRow] = 0;
+			leftBlackLoc[tmpRow] = 0xff;
 		}
 		if(right_loc_get == 0){
-			rightBlackLoc[tmpRow] = COL_B/SKIP_FOR_COL;
+			rightBlackLoc[tmpRow] = 0xff;
 		}
 	}
 }
@@ -69,10 +84,12 @@ void vTaskFollowing(void *pvParameters)
             else{
                 getLineEdge(line_pic0);
             }
+#if 1
             printf("[%s] the left line loc:\r\n",__func__);
             print_mess_info(leftBlackLoc,ROW_A/SKIP_FOR_ROW);
             printf("[%s] the right line loc:\r\n",__func__);
             print_mess_info(rightBlackLoc,ROW_A/SKIP_FOR_ROW);
+#endif
 			xQueueSend(xQueueCameraReady,&ready,3000);
         }
     }
