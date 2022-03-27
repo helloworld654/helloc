@@ -138,6 +138,39 @@ void getOneSideUsefulLine(uint8_t *needBlackLoc,uint8_t countZero,uint8_t *maxUB
 	
 }
 
+uint8_t line_regression_calcu(uint8_t *maxLineX,uint8_t *maxLineY,uint8_t maxLineLen,double *oK,int *ob)
+{
+	double x_sum = 0,y_sum = 0,xy_sum = 0,xx_sum = 0;
+	double x_avr = 0,y_avr = 0,xy_avr = 0,xx_avr = 0;
+	uint8_t i;
+	x_sum=0;y_sum=0;xy_sum=0;xx_sum=0;
+	
+	for(i=0;i < maxLineLen;i++)
+	{
+		x_sum += maxLineX[i];
+		y_sum += maxLineY[i];
+		xy_sum+=maxLineX[i]*maxLineY[i];
+		xx_sum+=maxLineX[i]*maxLineX[i];
+	}
+
+	x_avr=x_sum/(maxLineLen);
+	y_avr=y_sum/(maxLineLen);
+	xy_avr=xy_sum/(maxLineLen);
+	xx_avr=xx_sum/(maxLineLen);
+	
+	if((xy_avr-x_avr*y_avr)==0)
+	{
+		*oK = 0xff;
+		return 0;
+	}
+	else
+	{
+		*oK = (x_avr*x_avr-xx_avr)/(xy_avr-x_avr*y_avr);    // calcu the 1/k
+		*ob = maxLineY[0]-(1/(*oK))*(maxLineX[0]);		//  calcu the b
+		return 1;
+	}
+}
+
 uint8_t black_line_process(void)
 {
 	uint8_t leftLineGet,rightLineGet,countLeftZero,countRightZero;
@@ -145,10 +178,14 @@ uint8_t black_line_process(void)
 	uint8_t maxUsefulLeftLineX[ROW_A/SKIP_FOR_ROW] = {0};
 	uint8_t maxUsefulLeftLineY[ROW_A/SKIP_FOR_ROW] = {0};
 	uint8_t maxUsefulLeftLength = 0;
+	double left_K;
+	int left_B;
 	// the right line info
 	uint8_t maxUsefulRightLineX[ROW_A/SKIP_FOR_ROW] = {0};
 	uint8_t maxUsefulRightLineY[ROW_A/SKIP_FOR_ROW] = {0};
 	uint8_t maxUsefulRightLength = 0;
+	double right_K;
+	int right_B;
 
 	leftLineGet = rightLineGet = countLeftZero = countRightZero = 0;
 
@@ -181,7 +218,11 @@ uint8_t black_line_process(void)
 	if(leftLineGet == 1)
 	{
 		getOneSideUsefulLine(leftBlackLoc,countLeftZero,maxUsefulLeftLineX,maxUsefulLeftLineY,&maxUsefulLeftLength);
+		line_regression_calcu(maxUsefulLeftLineX,maxUsefulLeftLineY,maxUsefulLeftLength,&left_K,&left_B);
 #if 1
+		printf("the left info left_K:%f,left_B:%d\r\n",left_K,left_B);
+#endif
+#if 0
 		printf("[%s] the left max useful line %d loc:\r\n",__func__,maxUsefulLeftLength);
 		print_mess_info(maxUsefulLeftLineX,maxUsefulLeftLength);
 #endif
@@ -190,7 +231,7 @@ uint8_t black_line_process(void)
 	if(rightLineGet == 1)
 	{
 		getOneSideUsefulLine(rightBlackLoc,countRightZero,maxUsefulRightLineX,maxUsefulRightLineY,&maxUsefulRightLength);
-#if 1
+#if 0
 		printf("[%s] the right max useful line %d loc:\r\n",__func__,maxUsefulRightLength);
 		print_mess_info(maxUsefulRightLineX,maxUsefulRightLength);
 #endif

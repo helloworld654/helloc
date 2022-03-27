@@ -12,11 +12,13 @@ extern uint8_t line_pic0[ROW_A/SKIP_FOR_ROW][COL_B/SKIP_FOR_COL];
 extern uint8_t line_pic1[ROW_A/SKIP_FOR_ROW][COL_B/SKIP_FOR_COL];
 extern QueueHandle_t xQueueLineProcess;
 extern QueueHandle_t xQueueCameraReady;
-
 uint16_t rgb_buf[ROW_A][COL_B] = {0};
+
+//  the default value
 // uint8_t MAX_threshold=47,MIN_threshold=29 ;
+//  on window for day test
 uint8_t MAX_threshold=47;
-uint8_t MIN_threshold=10;   //  on window for night led is on
+uint8_t MIN_threshold=10;
 
 void camera_init(void)
 {
