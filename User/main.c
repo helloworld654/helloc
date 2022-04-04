@@ -61,6 +61,12 @@
 #include "includes.h"
 #include "camera.h"
 #include "following.h"
+
+#define FREE_RTOS_STUDY    1
+
+#if defined(FREE_RTOS_STUDY) && FREE_RTOS_STUDY
+#include "a_print_task_info.h"
+#endif
 /*
 **********************************************************************************************************
 											函数声明
@@ -115,11 +121,15 @@ int main(void)
 	   2. 为了正确获取FreeRTOS的调试信息，可以考虑将上面的关闭中断指令__set_PRIMASK(1); 注释掉。 
 	*/
 	vSetupSysInfoTest();
-	
+
+#if defined(FREE_RTOS_STUDY) && FREE_RTOS_STUDY	
+	create_tasks_func();
+#else
 	/* 创建任务 */
 	AppTaskCreate();
 
 	AppObjCreate();
+#endif
 	
     /* 启动调度，开始执行任务 */
     vTaskStartScheduler();
