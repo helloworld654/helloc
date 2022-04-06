@@ -688,6 +688,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\rtosstudy\src\a_print_task_info.c</FilePath>
             </File>
+            <File>
+              <FileName>b_timer_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\rtosstudy\src\b_timer_test.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

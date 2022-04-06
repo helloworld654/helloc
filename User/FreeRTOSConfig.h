@@ -108,6 +108,12 @@
 #define portGET_RUN_TIME_COUNTER_VALUE()             ulHighFrequencyTimerTicks
 //#define portALT_GET_RUN_TIME_COUNTER_VALUE           1
 
+/* Software timer definitions. */
+#define configUSE_TIMERS				  1
+#define configTIMER_TASK_PRIORITY		( 4 )   // can not extend the configMAX_PRIORITIES
+#define configTIMER_QUEUE_LENGTH		  10
+#define configTIMER_TASK_STACK_DEPTH	( configMINIMAL_STACK_SIZE * 2 )
+
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 		0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )

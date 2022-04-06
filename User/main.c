@@ -64,6 +64,7 @@
 
 #if defined(FREE_RTOS_STUDY) && FREE_RTOS_STUDY
 #include "a_print_task_info.h"
+#include "b_timer_test.h"
 #endif
 /*
 **********************************************************************************************************
@@ -121,7 +122,7 @@ int main(void)
 	vSetupSysInfoTest();
 
 #if defined(FREE_RTOS_STUDY) && FREE_RTOS_STUDY	
-	create_tasks_func();
+	create_timer_task_func();
 #else
 	/* 创建任务 */
 	AppTaskCreate();
