@@ -1,6 +1,8 @@
 #ifndef __CAMERA_H
 #define __CAMERA_H	
 
+#include "bsp.h"
+
 #define USE_F407ZG_BOARD    0
 #define USE_F407VE_BOARD    1
 
@@ -18,5 +20,6 @@
 void camera_init(void);
 void update_threshold_through_key(void);
 void vTaskCameraCapture(void *pvParameters);
+void update_key_for_camera(uint8_t key_num);
 
 #endif

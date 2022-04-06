@@ -84,16 +84,16 @@
 	*/
 
 	/* 按键口对应的RCC时钟 */
-	#define RCC_ALL_KEY 	(RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOF | RCC_AHB1Periph_GPIOH | RCC_AHB1Periph_GPIOI | RCC_AHB1Periph_GPIOG)
+	#define RCC_ALL_KEY 	(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOF | RCC_AHB1Periph_GPIOH | RCC_AHB1Periph_GPIOI | RCC_AHB1Periph_GPIOG)
 
-	#define GPIO_PORT_K1    GPIOI
+	#define GPIO_PORT_K1    GPIOB
 	#define GPIO_PIN_K1	    GPIO_Pin_8
 
-	#define GPIO_PORT_K2    GPIOC
-	#define GPIO_PIN_K2	    GPIO_Pin_13
+	#define GPIO_PORT_K2    GPIOB
+	#define GPIO_PIN_K2	    GPIO_Pin_9
 
-	#define GPIO_PORT_K3    GPIOI
-	#define GPIO_PIN_K3	    GPIO_Pin_11
+	#define GPIO_PORT_K3    GPIOA
+	#define GPIO_PIN_K3	    GPIO_Pin_0
 
 	#define GPIO_PORT_K4    GPIOH
 	#define GPIO_PIN_K4	    GPIO_Pin_2

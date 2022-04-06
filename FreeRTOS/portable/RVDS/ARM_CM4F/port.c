@@ -512,6 +512,7 @@ __asm void xPortPendSVHandler( void )
 }
 /*-----------------------------------------------------------*/
 
+extern void SysTick_ISR(void);
 void xPortSysTickHandler( void )
 {
 	/* The SysTick runs at the lowest interrupt priority, so when this interrupt
@@ -520,6 +521,7 @@ void xPortSysTickHandler( void )
 	known. */
 	( void ) portSET_INTERRUPT_MASK_FROM_ISR();
 	{
+		SysTick_ISR();
 		/* Increment the RTOS tick. */
 		if( xTaskIncrementTick() != pdFALSE )
 		{

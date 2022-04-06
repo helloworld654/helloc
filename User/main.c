@@ -62,8 +62,6 @@
 #include "camera.h"
 #include "following.h"
 
-#define FREE_RTOS_STUDY    1
-
 #if defined(FREE_RTOS_STUDY) && FREE_RTOS_STUDY
 #include "a_print_task_info.h"
 #endif
@@ -223,11 +221,29 @@ static void vTaskFPScalcu(void *pvParameters)
 */
 static void vTaskKeyCapture(void *pvParameters)
 {
-	KEY_Init();
+	uint8_t ucKeyCode;
+	printf("key task init\r\n");
     while(1)
     {
-		update_threshold_through_key();
-        vTaskDelay(10);
+		ucKeyCode = bsp_GetKey();
+		if (ucKeyCode > 0)
+		{
+			switch (ucKeyCode)
+			{
+				case KEY_DOWN_K1:
+					printf("get key1\r\n");
+					break;
+
+				case KEY_DOWN_K2:
+					printf("get key2\r\n");
+					break;
+
+				default:
+					break;
+			}
+			update_key_for_camera(ucKeyCode);
+		}
+        vTaskDelay(5);
     }
 }
 

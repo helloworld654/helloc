@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "bsp.h"
 #if USE_F407ZG_BOARD == 1
 #include "lcd.h"
 #endif
@@ -59,6 +60,22 @@ void update_threshold_through_key(void)
 			default:
 				break;
 		}
+	}
+}
+
+void update_key_for_camera(uint8_t key_num)
+{
+	switch(key_num){
+		case KEY_DOWN_K1:
+			printf("[%s] get key1\r\n",__func__);
+			MIN_threshold++;
+			break;
+		case KEY_DOWN_K2:
+			printf("[%s] get key2\r\n",__func__);
+			MIN_threshold--;
+			break;
+		default:
+			break;
 	}
 }
 

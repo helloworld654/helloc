@@ -39,8 +39,13 @@ void bsp_Init(void)
 
 	// bsp_InitUart(); 	/* 初始化串口 */
 	uart_init(115200);
-	// bsp_InitKey();		/* 初始化按键变量 */
+	bsp_InitKey();		/* 初始化按键变量 */
 	bsp_InitLed(); 		/* 初始LED指示灯端口 */
+}
+
+void bsp_RunPer10ms(void)
+{
+	bsp_KeyScan();
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

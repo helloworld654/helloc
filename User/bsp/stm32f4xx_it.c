@@ -138,4 +138,17 @@ void DebugMon_Handler(void)
 {
 }
 
+extern void bsp_RunPer10ms(void);
+void SysTick_ISR(void)
+{
+	static uint8_t s_count = 0;
+
+	if (++s_count >= 10)
+	{
+		s_count = 0;
+
+		bsp_RunPer10ms();	/* 每隔10ms调用一次此函数，此函数在 bsp.c */
+	}
+}
+
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/
