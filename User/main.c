@@ -198,6 +198,7 @@ extern uint16_t fps_recording;
 static void vTaskFPScalcu(void *pvParameters)
 {
 	uint8_t num = 0;
+	pwm_func_test();
 	bsp_LedOn(2);
 	bsp_LedOff(3);
     while(1)
